@@ -37,7 +37,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref 'VPC'
-      AvailabilityZone: !Select [0, !GetAZs !Ref 'AWS::Region']
+      AvailabilityZone: !Select [0, !GetAZs '']
       CidrBlock: !Ref 'DataCenterPublicSubnetCIDR'
       MapPublicIpOnLaunch: true
       Tags:
