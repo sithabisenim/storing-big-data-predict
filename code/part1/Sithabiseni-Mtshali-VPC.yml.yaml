@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: This template provisions essential networking infrastructure and security groups in AWS. It establishes a Virtual Private Cloud (VPC) with an attached Internet Gateway for internet connectivity. Additionally, it configures a public subnet, routing rules, and security groups for Windows instances, a file server, and a file gateway.
 Parameters:
   EnvironmentName:
     Type: String
