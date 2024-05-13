@@ -1,5 +1,4 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: Template for provisioning a Windows EC2 instance in AWS
+Description: Windows Instance Template
 
 Parameters:
   KeyName:
@@ -7,52 +6,41 @@ Parameters:
     Description: Select the key pair to decrypt the Windows instance password
   VPC:
     Type: AWS::EC2::VPC::Id
-    Description: Select the VPC for the instance
+    Description: Select the VPC ID
   Subnet:
     Type: AWS::EC2::Subnet::Id
-    Description: Select the public subnet for the instance
+    Description: Select the Subnet ID
   SecurityGroupIds:
     Type: List<AWS::EC2::SecurityGroup::Id>
-    Description: Select one or more security groups for the instance
+    Description: Select one or more Security Group IDs
   LatestWindowsAmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Description: Path to the latest Windows AMI
+    Description: The latest Windows AMI ID
     Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
 
 Resources:
-  WindowsInstanceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: WindowsInstanceRole
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ec2.amazonaws.com
-            Action: sts:AssumeRole
-
   WindowsInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
       Roles:
-        - Ref: WindowsInstanceRole
+        - WindowsInstanceRole
 
   WindowsInstanceRolePolicy:
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: !Sub "Windows-client-${AWS::StackName}"
+      Roles:
+        - WindowsInstanceRole
       PolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Action:
               - s3:Get*
               - s3:List*
             Resource: "*"
-      Roles:
-        - Ref: WindowsInstanceRole
+      DeletionPolicy: Delete
 
   WindowsInstance:
     Type: AWS::EC2::Instance
@@ -66,14 +54,3 @@ Resources:
       Tags:
         - Key: Name
           Value: DE-Extract-Windows-Instance
-
-Outputs:
-  WindowsInstanceID:
-    Description: "ID of the Windows EC2 instance"
-    Value: !Ref WindowsInstance
-    Export:
-      Name: "WindowsInstanceID"
-    Description: "ID of the Windows EC2 instance"
-    Value: !Ref WindowsInstance
-    Export:
-      Name: "WindowsInstanceID"
