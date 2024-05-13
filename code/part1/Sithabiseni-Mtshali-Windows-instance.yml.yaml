@@ -31,7 +31,6 @@ Resources:
             Principal:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
-      DeletionPolicy: Delete
 
   WindowsInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -70,6 +69,10 @@ Resources:
 
 Outputs:
   WindowsInstanceID:
+    Description: "ID of the Windows EC2 instance"
+    Value: !Ref WindowsInstance
+    Export:
+      Name: "WindowsInstanceID"
     Description: "ID of the Windows EC2 instance"
     Value: !Ref WindowsInstance
     Export:
