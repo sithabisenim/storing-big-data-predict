@@ -5,12 +5,15 @@ Parameters:
     Type: String
     Default: DE-Extract
     Description: A string that will be prefixed onto each resource created in the template.
-  VpcId:
+  Vpc:
     Type: AWS::EC2::VPC::Id
     Description: Select the VPC for the instance
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the key pair to decrypt the Windows instance password
+  Subnet:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select the subnet for the instance
   SecurityGroupIds:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: Select one or more security groups for the instance
@@ -61,7 +64,7 @@ Resources:
       KeyName: !Ref KeyName
       InstanceType: t2.micro
       SecurityGroupIds: !Ref SecurityGroupIds
-      SubnetId: !Ref VpcId
+      SubnetId: !Ref Subnet
       IamInstanceProfile: !Ref WindowsInstanceProfile
       Tags:
         - Key: Name
@@ -69,10 +72,6 @@ Resources:
 
 Outputs:
   WindowsInstanceID:
-    Description: "ID of the Windows EC2 instance"
-    Value: !Ref WindowsInstance
-    Export:
-      Name: "WindowsInstanceID"
     Description: "ID of the Windows EC2 instance"
     Value: !Ref WindowsInstance
     Export:
