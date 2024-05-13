@@ -17,6 +17,10 @@ Parameters:
   ExistingRoleName:
     Type: String
     Description: Name of the existing IAM role to use
+  LatestWindowsAmiId:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Description: Path to the latest Windows AMI
+    Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
 
 Resources:
   WindowsInstanceProfile:
