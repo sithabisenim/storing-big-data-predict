@@ -1,19 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: This template provisions a Windows EC2 instance in the provided VPC with the required networking infrastructure and security groups.
+Description: Template for provisioning a Windows EC2 instance in AWS
+
 Parameters:
-  EnvironmentName:
-    Type: String
-    Default: DE-Extract
-    Description: A string that will be prefixed onto each resource created in the template.
-  Vpc:
-    Type: AWS::EC2::VPC::Id
-    Description: Select the VPC for the instance
   KeyName:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select the key pair to decrypt the Windows instance password
+  VPC:
+    Type: AWS::EC2::VPC::Id
+    Description: Select the VPC for the instance
   Subnet:
     Type: AWS::EC2::Subnet::Id
-    Description: Select the subnet for the instance
+    Description: Select the public subnet for the instance
   SecurityGroupIds:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: Select one or more security groups for the instance
@@ -34,6 +31,7 @@ Resources:
             Principal:
               Service: ec2.amazonaws.com
             Action: sts:AssumeRole
+      DeletionPolicy: Delete
 
   WindowsInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -68,7 +66,7 @@ Resources:
       IamInstanceProfile: !Ref WindowsInstanceProfile
       Tags:
         - Key: Name
-          Value: !Ref EnvironmentName
+          Value: DE-Extract-Windows-Instance
 
 Outputs:
   WindowsInstanceID:
