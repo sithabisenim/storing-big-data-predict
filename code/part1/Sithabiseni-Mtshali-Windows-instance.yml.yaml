@@ -1,3 +1,4 @@
+AWSTemplateFormatVersion: '2010-09-09'
 Description: Windows Instance Template
 
 Parameters:
@@ -40,7 +41,6 @@ Resources:
               - s3:Get*
               - s3:List*
             Resource: "*"
-      DeletionPolicy: Delete
 
   WindowsInstance:
     Type: AWS::EC2::Instance
