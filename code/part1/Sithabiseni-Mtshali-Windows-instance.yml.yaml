@@ -14,45 +14,17 @@ Parameters:
   SecurityGroupIds:
     Type: List<AWS::EC2::SecurityGroup::Id>
     Description: Select one or more security groups for the instance
-  LatestWindowsAmiId:
-    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
-    Description: Path to the latest Windows AMI
-    Default: /aws/service/ami-windows-latest/Windows_Server-2019-English-Full-Base
+  ExistingRoleName:
+    Type: String
+    Description: Name of the existing IAM role to use
 
 Resources:
-  WindowsInstanceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: WindowsInstanceRole
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ec2.amazonaws.com
-            Action: sts:AssumeRole
-
   WindowsInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
       Roles:
-        - Ref: WindowsInstanceRole
-
-  WindowsInstanceRolePolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: !Sub "Windows-client-${AWS::StackName}"
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:Get*
-              - s3:List*
-            Resource: "*"
-      Roles:
-        - Ref: WindowsInstanceRole
+        - !Ref ExistingRoleName
 
   WindowsInstance:
     Type: AWS::EC2::Instance
