@@ -41,7 +41,7 @@ Resources:
               - s3:Get*
               - s3:List*
             Resource: "*"
-
+    DeletionPolicy: Delete
   WindowsInstance:
     Type: AWS::EC2::Instance
     Properties:
