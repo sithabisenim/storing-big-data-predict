@@ -1,4 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
+Description: This template provisions essential networking infrastructure and security groups in AWS. It establishes a Virtual Private Cloud (VPC) with an attached Internet Gateway for internet connectivity. Additionally, it configures a public subnet, routing rules, and security groups for Windows instances, a file server, and a file gateway.
 Parameters:
   EnvironmentName:
     Type: String
@@ -22,17 +23,23 @@ Resources:
       Tags:
         - Key: Name
           Value: !Ref 'EnvironmentName'
+    DeletionPolicy: Retain
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
         - Key: Name
           Value: !Ref 'EnvironmentName'
+    DeletionPolicy: Retain
+
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref 'VPC'
       InternetGatewayId: !Ref 'InternetGateway'
+    DeletionPolicy: Retain
+
   DataCenterPublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -43,6 +50,8 @@ Resources:
       Tags:
         - Key: Name
           Value: DE-Extract Data Center Subnet
+    DeletionPolicy: Retain
+
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -50,6 +59,8 @@ Resources:
       Tags:
         - Key: Name
           Value: DE-Extract Public Routes
+    DeletionPolicy: Retain
+
   DefaultPublicRoute:
     DependsOn: InternetGatewayAttachment
     Type: AWS::EC2::Route
@@ -57,11 +68,15 @@ Resources:
       RouteTableId: !Ref 'PublicRouteTable'
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref 'InternetGateway'
+    DeletionPolicy: Retain
+
   DataCenterPublicSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       SubnetId: !Ref 'DataCenterPublicSubnet'
       RouteTableId: !Ref 'PublicRouteTable'
+    DeletionPolicy: Retain
+
   WindowsInstanceSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -76,6 +91,8 @@ Resources:
       Tags:
         - Key: Name
           Value: DE-Extract-WindowsInstanceSG
+    DeletionPolicy: Retain
+
   FileServerSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -90,6 +107,8 @@ Resources:
       Tags:
         - Key: Name
           Value: DE-Extract-FileServerSG
+    DeletionPolicy: Retain
+
   FileGatewaySG:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -104,3 +123,4 @@ Resources:
       Tags:
         - Key: Name
           Value: DE-Extract-FileGatewaySG
+    DeletionPolicy: Retain
