@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This template provisions essential networking infrastructure and security groups in AWS. It establishes a Virtual Private Cloud (VPC) with an attached Internet Gateway for internet connectivity. Additionally, it configures a public subnet, routing rules, and security groups for Windows instances, a file server, and a file gateway.
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: DE-Extract
+    Description: A string that will be prefixed onto each resource created in the template.
+  VpcCIDR:
+    Type: String
+    Default: 192.168.0.0/16
+    Description: The IPv4 address space for the VPC hosting the scenario challenge.
+  DataCenterPublicSubnetCIDR:
+    Type: String
+    Default: 192.168.10.0/24
+    Description: The IPv4 address space for the publicly accessible portion of the VPC.
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref 'VpcCIDR'
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref 'EnvironmentName'
+    DeletionPolicy: Retain
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Ref 'EnvironmentName'
+    DeletionPolicy: Retain
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref 'VPC'
+      InternetGatewayId: !Ref 'InternetGateway'
+    DeletionPolicy: Retain
+
+  DataCenterPublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref 'VPC'
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: !Ref 'DataCenterPublicSubnetCIDR'
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: DE-Extract Data Center Subnet
+    DeletionPolicy: Retain
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+      Tags:
+        - Key: Name
+          Value: DE-Extract Public Routes
+    DeletionPolicy: Retain
+
+  DefaultPublicRoute:
+    DependsOn: InternetGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref 'PublicRouteTable'
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref 'InternetGateway'
+    DeletionPolicy: Retain
+
+  DataCenterPublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref 'DataCenterPublicSubnet'
+      RouteTableId: !Ref 'PublicRouteTable'
+    DeletionPolicy: Retain
+
+  WindowsInstanceSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref 'VPC'
+      GroupName: DE-Extract-WindowsInstanceSG
+      GroupDescription: Security group for Windows instances allowing RDP access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: DE-Extract-WindowsInstanceSG
+    DeletionPolicy: Retain
+
+  FileServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref 'VPC'
+      GroupName: DE-Extract-FileServerSG
+      GroupDescription: Security group for file server allowing SSH access from internal sources
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 192.168.10.0/24
+      Tags:
+        - Key: Name
+          Value: DE-Extract-FileServerSG
+    DeletionPolicy: Retain
+
+  FileGatewaySG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref 'VPC'
+      GroupName: DE-Extract-FileGatewaySG
+      GroupDescription: Security group for file gateway allowing internal communication
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 1
+          ToPort: 65534
+          CidrIp: 192.168.0.0/16
+      Tags:
+        - Key: Name
+          Value: DE-Extract-FileGatewaySG
+    DeletionPolicy: Retain
