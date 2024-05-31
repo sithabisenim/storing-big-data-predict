@@ -69,7 +69,7 @@ Here is what is expected inside of the zip folder uploaded by a student named Do
 3. Dora-Explorer-Architecture-Diagram.png   
 4. Dora-Explorer.csv (see below for example)  
 
-| Mtshali | Surname | File Gateway S3 Bucket Name | Fileshare Alert SNS Topic ARN | Delivery Stream S3 Bucket Name | Streaming SNS Topic ARN |
+| Name | Surname | File Gateway S3 Bucket Name | Fileshare Alert SNS Topic ARN | Delivery Stream S3 Bucket Name | Streaming SNS Topic ARN |
 |--- |--- |--- |--- |--- |--- |
 | Sithabiseni | Mtshali | 2401ftdesithabisenimtshali-source-file-gateway | arn:aws:sns:eu-west-1:445492270995:2401FTDESITMTS-Fileshare-alert | 2401ftdesithabisenimtshali-deliverystream-s3 | arn:aws:sns:eu-west-1:445492270995:2401FTDESITMTS-streaming-sns-topic |
 
